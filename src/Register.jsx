@@ -40,7 +40,7 @@ const Register = () => {
       });
   return (
     <div className="App">
-      <h1>Validation with Formik + Yup</h1>
+      <h1>SignUp Form</h1>
 
       <form onSubmit={formik.handleSubmit}>
         <div>
@@ -65,6 +65,7 @@ const Register = () => {
           />
           {formik.errors.email && formik.touched.email && (
             <p>{formik.errors.email}</p>
+            
           )}
         </div>
         <div>

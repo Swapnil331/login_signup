@@ -6,7 +6,7 @@ export const signupschema = Yup.object({
     password: Yup.string()
        .min(4, "Password must be minimum 4 digits!")
        .required("Password Required!"),
-       confirm_password: Yup.string()
+    confirm_password: Yup.string()
        .oneOf([Yup.ref("password"), null], "Password must match!")
       .required("Confirm password is reqired!"),
 })

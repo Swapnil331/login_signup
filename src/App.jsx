@@ -8,12 +8,16 @@ import Login from './Login';
 import Register from './Register';
 import { Route, createBrowserRouter, createRoutesFromElements, RouterProvider } from 'react-router-dom';
 import Dashboard from './Dashboard';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import Navbarbootstrap from './Components/Navbarbootstrap';
+
 
 function App() {
   const router = createBrowserRouter([
    {
     path : "/",
     element:<Register/>
+    
    },
    {
     path : "/login",
@@ -26,12 +30,14 @@ function App() {
     ])
 
   return (
-    <>
-     <>
+    <div>
+     
+     
       <RouterProvider router={router}/>
-    </>
+      
+      </div>
 
-    </>
+    
   )
 }
 
