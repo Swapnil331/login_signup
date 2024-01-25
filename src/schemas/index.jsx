@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 
+
 export const signupschema = Yup.object({
     full_name:Yup.string().min(2).max(10).required("Name is required"),
     email:Yup.string().email().required("Email is required"),
