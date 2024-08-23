@@ -1,1 +1,52 @@
-var payload = new { PanNumber = Encpan, Fund = FundValue, SecurityKey = DynamicSecurityKey }; WriteLog("DashBoard", Encpan + " " + FundValue); var jsonPayload = JsonConvert.SerializeObject(payload); using (HttpClient httpClient = new HttpClient()) { string apiUrl = "http://localhost:44376/api/WebKiosk/GetPortfolio"; var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json"); HttpResponseMessage response = await httpClient.PostAsync(apiUrl, content); if (response.IsSuccessStatusCode) { /*var responseData = await response.Content.ReadAsAsync<dynamic>(); return Content(responseData);*/ var responseData = await response.Content.ReadAsAsync<DataSet>(); Session["UserDataSet"] = responseData; var res = new InvestmentDetails { InvName = responseData.Tables[1].Rows[0]["Invname"]?.ToString(), Singleusercnt = Convert.ToInt32(responseData.Tables[1].Rows[0]["Singlerusercnt"]), Anyoneorsurvcnt = Convert.ToInt32(responseData.Tables[1].Rows[0]["Anyoneorsurvcnt"]), Jointholdercnt = Convert.ToInt32(responseData.Tables[1].Rows[0]["jointholdercnt"]) };
+
+https://clientwebsitesuat2.kfintech.com/Yatra/uat/Login/Token
+    {
+        "Fund": "139",
+        "Key": "!@#$@!#$&*^",
+        "EmailID":"swapnilmahadev.shinde@kfintech.com"
+    }
+
+https://clientwebsitesuat2.kfintech.com/Yatra/uat/Email/Trigger/Transaction
+[{
+  "SlNo":2,
+  "fund": "128",
+  "branch": "MB88",
+  "ihno": 121,
+  "transactionNo": 12923,
+  "acno": "89797184645",
+  "transactionDate": "2024-06017",
+  "trType": "Additional",
+  "feedType": "purchase",
+  "FromID": "samfd@kfintech.com",
+  "toID": "swapnilmahadev.shinde@kfintech.com",
+  "CCID": "",
+  "BCCID": "",
+  "hasAttachment": "false",
+  "attachmentPath": "",
+  "investorName": "Test Investor",
+  "eventID": 20395,
+   "contentPlaceHolderValues": "((EIHNO))##123456789|((FolioNo))##78653213412|((SchDesc))##MiraeAssetMutualFundGrowth|((PIHNO))##2134124213|((SchTrDtTim))##2024-09-06|((RefNO))#234132|((SchTrDtTim))##2024-09-05|((RefNO))##2134213423|((PsPeriod))##4|((Pstartdate))##2024-09-06|((PEnddate))##2030-09-06",
+  "subjectPlaceHolderValues": "((amcname))##Mirae MF",
+  "useAPI": true
+},{
+  "SlNo":2,
+  "fund": "128",
+  "branch": "MB88",
+  "ihno": 1234351234,
+  "transactionNo": 1234123,
+  "acno": "89298924637",
+  "transactionDate": "2024-06017",
+  "trType": "Additional",
+  "feedType": "purchase",
+  "FromID": "samfd@kfintech.com",
+  "toID": "swapnilmahadev.shinde@kfintech.com",
+  "CCID": "",
+  "BCCID": "",
+  "hasAttachment": "false",
+  "attachmentPath": "",
+  "investorName": "Test Investor",
+  "eventID": 20392,
+   "contentPlaceHolderValues": "((Name))##Ajay|((Date))##2024-08-06|((agent))##ARN-01234|((agentcode))##123456",
+  "subjectPlaceHolderValues": "((amcname))##Nippon MF|",
+  "useAPI": true
+}]
