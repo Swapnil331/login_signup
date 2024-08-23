@@ -1,52 +1,107 @@
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
-https://clientwebsitesuat2.kfintech.com/Yatra/uat/Login/Token
+public class ApiService
+{
+    private static readonly HttpClient client = new HttpClient();
+
+    // Method to generate token
+    public async Task<string> GenerateTokenAsync()
     {
-        "Fund": "139",
-        "Key": "!@#$@!#$&*^",
-        "EmailID":"swapnilmahadev.shinde@kfintech.com"
+        var tokenUrl = "https://clientwebsitesuat2.kfintech.com/Yatra/uat/Login/Token";
+        var tokenPayload = new
+        {
+            Fund = "139",
+            Key = "!@#$@!#$&*^",
+            EmailID = "swapnilmahadev.shinde@kfintech.com"
+        };
+
+        var jsonContent = JsonConvert.SerializeObject(tokenPayload);
+        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+        var response = await client.PostAsync(tokenUrl, content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var responseContent = await response.Content.ReadAsStringAsync();
+            // Assuming the response contains a JSON object with a "token" field
+            var tokenResponse = JsonConvert.DeserializeObject<dynamic>(responseContent);
+            return tokenResponse?.token;
+        }
+        else
+        {
+            throw new Exception($"Token generation failed with status code: {response.StatusCode}");
+        }
     }
 
-https://clientwebsitesuat2.kfintech.com/Yatra/uat/Email/Trigger/Transaction
-[{
-  "SlNo":2,
-  "fund": "128",
-  "branch": "MB88",
-  "ihno": 121,
-  "transactionNo": 12923,
-  "acno": "89797184645",
-  "transactionDate": "2024-06017",
-  "trType": "Additional",
-  "feedType": "purchase",
-  "FromID": "samfd@kfintech.com",
-  "toID": "swapnilmahadev.shinde@kfintech.com",
-  "CCID": "",
-  "BCCID": "",
-  "hasAttachment": "false",
-  "attachmentPath": "",
-  "investorName": "Test Investor",
-  "eventID": 20395,
-   "contentPlaceHolderValues": "((EIHNO))##123456789|((FolioNo))##78653213412|((SchDesc))##MiraeAssetMutualFundGrowth|((PIHNO))##2134124213|((SchTrDtTim))##2024-09-06|((RefNO))#234132|((SchTrDtTim))##2024-09-05|((RefNO))##2134213423|((PsPeriod))##4|((Pstartdate))##2024-09-06|((PEnddate))##2030-09-06",
-  "subjectPlaceHolderValues": "((amcname))##Mirae MF",
-  "useAPI": true
-},{
-  "SlNo":2,
-  "fund": "128",
-  "branch": "MB88",
-  "ihno": 1234351234,
-  "transactionNo": 1234123,
-  "acno": "89298924637",
-  "transactionDate": "2024-06017",
-  "trType": "Additional",
-  "feedType": "purchase",
-  "FromID": "samfd@kfintech.com",
-  "toID": "swapnilmahadev.shinde@kfintech.com",
-  "CCID": "",
-  "BCCID": "",
-  "hasAttachment": "false",
-  "attachmentPath": "",
-  "investorName": "Test Investor",
-  "eventID": 20392,
-   "contentPlaceHolderValues": "((Name))##Ajay|((Date))##2024-08-06|((agent))##ARN-01234|((agentcode))##123456",
-  "subjectPlaceHolderValues": "((amcname))##Nippon MF|",
-  "useAPI": true
-}]
+    // Method to create a transaction using the generated token
+    public async Task CreateTransactionAsync(string token)
+    {
+        var transactionUrl = "https://clientwebsitesuat2.kfintech.com/Yatra/uat/Email/Trigger/Transaction";
+        var transactionPayload = new
+        {
+            SlNo = 2,
+            fund = "128",
+            branch = "MB88",
+            ihno = 121,
+            transactionNo = 12923,
+            acno = "89797184645",
+            transactionDate = "2024-06-17", // Corrected the date format
+            trType = "Additional",
+            feedType = "purchase",
+            FromID = "samfd@kfintech.com",
+            toID = "swapnilmahadev.shinde@kfintech.com",
+            CCID = "",
+            BCCID = "",
+            hasAttachment = "false",
+            attachmentPath = "",
+            investorName = "Test Investor",
+            eventID = 20395,
+            contentPlaceHolderValues = "((EIHNO))##123456789|((FolioNo))##78653213412|((SchDesc))##MiraeAssetMutualFundGrowth|((PIHNO))##2134124213|((SchTrDtTim))##2024-09-06|((RefNO))#234132|((SchTrDtTim))##2024-09-05|((RefNO))##2134213423|((PsPeriod))##4|((Pstartdate))##2024-09-06|((PEnddate))##2030-09-06",
+            subjectPlaceHolderValues = "((amcname))##Mirae MF",
+            useAPI = true
+        };
+
+        var jsonContent = JsonConvert.SerializeObject(transactionPayload);
+        var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+        
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await client.PostAsync(transactionUrl, content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Transaction created successfully.");
+        }
+        else
+        {
+            throw new Exception($"Transaction creation failed with status code: {response.StatusCode}");
+        }
+    }
+
+    public async Task ExecuteAsync()
+    {
+        try
+        {
+            string token = await GenerateTokenAsync();
+            await CreateTransactionAsync(token);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+    }
+}
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        var apiService = new ApiService();
+        await apiService.ExecuteAsync();
+    }
+}
