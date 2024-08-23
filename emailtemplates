@@ -1,27 +1,16 @@
-  string tokenUrl = "https://clientwebsitesuat2.kfintech.com/Yatra/uat/Login/Token";
+public async Task emailTemplateAPI()
+        {
+            string tokenUrl = "https://clientwebsitesuat2.kfintech.com/Yatra/uat/Login/Token";
             string transactionUrl = "https://clientwebsitesuat2.kfintech.com/Yatra/uat/Email/Trigger/Transaction";
 
-using System;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+            var tokenPayload = new
+            {
+                Fund = "139",
+                Key = "!@#$@!#$&*^",
+                EmailID = "swapnilmahadev.shinde@kfintech.com"
+            };
 
-class Program
-{
-    static async Task Main(string[] args)
-    {
-        string tokenUrl = "https://clientwebsitesuat2.kfintech.com/Yatra/uat/Login/Token";
-        string transactionUrl = "https://clientwebsitesuat2.kfintech.com/Yatra/uat/Email/Trigger/Transaction";
-
-        var tokenPayload = new
-        {
-            Fund = "139",
-            Key = "!@#$@!#$&*^",
-            EmailID = "swapnilmahadev.shinde@kfintech.com"
-        };
-
-        var transactionPayload = new[]
+            var transactionPayload = new[]
         {
             new
             {
@@ -48,28 +37,27 @@ class Program
             }
         };
 
-        try
-        {
-            string tokenResult = await GenerateTokenAsync(tokenUrl, tokenPayload);
-            Console.WriteLine("Token API Response: " + tokenResult);
+            try
+            {
+                string tokenResult = await GenerateTokenAsync(tokenUrl, tokenPayload);
+                Console.WriteLine("Token API Response: " + tokenResult);
 
-            string transactionResult = await TriggerTransactionAsync(transactionUrl, transactionPayload);
-            Console.WriteLine("Transaction API Response: " + transactionResult);
+                var transactionResult = await TriggerTransactionAsync(transactionUrl, transactionPayload);
+                Console.WriteLine("Transaction API Response: " + transactionResult);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine("An error occurred: " + ex.Message);
-        }
-    }
 
+    
     static async Task<string> GenerateTokenAsync(string url, object payload)
     {
         using (HttpClient client = new HttpClient())
         {
-            var jsonPayload = JsonConvert.SerializeObject(payload);
-            Console.WriteLine("Serialized Token Payload: " + jsonPayload);
-
-            var response = await client.PostAsync(url, new StringContent(jsonPayload, Encoding.UTF8, "application/json"));
+            var response = await client.PostAsync(url, new StringContent(
+                JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json"));
 
             if (response.IsSuccessStatusCode)
             {
@@ -82,14 +70,12 @@ class Program
         }
     }
 
-    static async Task<string> TriggerTransactionAsync(string url, object payload)
+    public async Task<string> TriggerTransactionAsync(string url, object payload)
     {
         using (HttpClient client = new HttpClient())
         {
-            var jsonPayload = JsonConvert.SerializeObject(payload);
-            Console.WriteLine("Serialized Transaction Payload: " + jsonPayload);
-
-            var response = await client.PostAsync(url, new StringContent(jsonPayload, Encoding.UTF8, "application/json"));
+            var response = await client.PostAsync(url, new StringContent(
+                JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json"));
 
             if (response.IsSuccessStatusCode)
             {
@@ -101,4 +87,3 @@ class Program
             }
         }
     }
-}
