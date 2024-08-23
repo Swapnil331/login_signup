@@ -1,0 +1,104 @@
+  string tokenUrl = "https://clientwebsitesuat2.kfintech.com/Yatra/uat/Login/Token";
+            string transactionUrl = "https://clientwebsitesuat2.kfintech.com/Yatra/uat/Email/Trigger/Transaction";
+
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        string tokenUrl = "https://clientwebsitesuat2.kfintech.com/Yatra/uat/Login/Token";
+        string transactionUrl = "https://clientwebsitesuat2.kfintech.com/Yatra/uat/Email/Trigger/Transaction";
+
+        var tokenPayload = new
+        {
+            Fund = "139",
+            Key = "!@#$@!#$&*^",
+            EmailID = "swapnilmahadev.shinde@kfintech.com"
+        };
+
+        var transactionPayload = new[]
+        {
+            new
+            {
+                SlNo = 2,
+                fund = "128",
+                branch = "MB88",
+                ihno = 121,
+                transactionNo = 12923,
+                acno = "89797184645",
+                transactionDate = "2024-06017",
+                trType = "Additional",
+                feedType = "purchase",
+                FromID = "samfd@kfintech.com",
+                toID = "swapnilmahadev.shinde@kfintech.com",
+                CCID = "",
+                BCCID = "",
+                hasAttachment = "false",
+                attachmentPath = "",
+                investorName = "Test Investor",
+                eventID = 20395,
+                contentPlaceHolderValues = "((EIHNO))##123456789|((FolioNo))##78653213412|((SchDesc))##MiraeAssetMutualFundGrowth|((PIHNO))##2134124213|((SchTrDtTim))##2024-09-06|((RefNO))#234132|((SchTrDtTim))##2024-09-05|((RefNO))##2134213423|((PsPeriod))##4|((Pstartdate))##2024-09-06|((PEnddate))##2030-09-06",
+                subjectPlaceHolderValues = "((amcname))##Mirae MF",
+                useAPI = true
+            }
+        };
+
+        try
+        {
+            string tokenResult = await GenerateTokenAsync(tokenUrl, tokenPayload);
+            Console.WriteLine("Token API Response: " + tokenResult);
+
+            string transactionResult = await TriggerTransactionAsync(transactionUrl, transactionPayload);
+            Console.WriteLine("Transaction API Response: " + transactionResult);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("An error occurred: " + ex.Message);
+        }
+    }
+
+    static async Task<string> GenerateTokenAsync(string url, object payload)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            var jsonPayload = JsonConvert.SerializeObject(payload);
+            Console.WriteLine("Serialized Token Payload: " + jsonPayload);
+
+            var response = await client.PostAsync(url, new StringContent(jsonPayload, Encoding.UTF8, "application/json"));
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                throw new Exception("Token API call failed with status code: " + response.StatusCode);
+            }
+        }
+    }
+
+    static async Task<string> TriggerTransactionAsync(string url, object payload)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            var jsonPayload = JsonConvert.SerializeObject(payload);
+            Console.WriteLine("Serialized Transaction Payload: " + jsonPayload);
+
+            var response = await client.PostAsync(url, new StringContent(jsonPayload, Encoding.UTF8, "application/json"));
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                throw new Exception("Transaction API call failed with status code: " + response.StatusCode);
+            }
+        }
+    }
+}
