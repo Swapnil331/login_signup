@@ -23,105 +23,28 @@ namespace MailingSelectedUsers
     class Program
     {
         string body;
-
-        //public static void SendSms(string folio, string fund, string trtype, string ihno, string mobile, string msg)
-        //{
-           
-        //    using (var connection = new SqlConnection(ConfigurationManager.ConnectionStrings["MFDWEB"].ConnectionString))
-        //    {
-        //        connection.Open();
-
-        //        using (var command = new SqlCommand("KTrack_Mob_InsertSMSLog_V17", connection))
-        //        {
-        //            command.CommandType = CommandType.StoredProcedure;
-
-        //            command.Parameters.Add("@i_Folio", SqlDbType.VarChar, 150).Value = folio;
-        //            command.Parameters.Add("@i_Fund", SqlDbType.VarChar, 150).Value = fund;
-        //            command.Parameters.Add("@i_TrNo", SqlDbType.VarChar, 150).Value = "";
-        //            command.Parameters.Add("@i_TrType", SqlDbType.VarChar, 150).Value = trtype;
-        //            command.Parameters.Add("@i_IHNo", SqlDbType.VarChar, 150).Value = ihno;
-        //            command.Parameters.Add("@i_MobileNo", SqlDbType.VarChar, 150).Value = mobile;
-        //            command.Parameters.Add("@i_OtpNo", SqlDbType.VarChar, 150).Value = "";
-        //            command.Parameters.Add("@i_customfund", SqlDbType.VarChar, 10).Value = fund;
-        //            command.Parameters.Add("@i_Msg", SqlDbType.VarChar, 200).Value = msg;
-
-        //            command.ExecuteNonQuery();
-        //        }
-        //    }
-        //}
         public static void insertSmS(String msg, String Mobile, string trtype = "") //
-        {
-            //DataSet sessionds = HttpContext.Current.Session["inv_ds"] as DataSet;
-
-            //String folio= sessionds.Tables[0].Rows[0]["Folio_No"].ToString();
-            //String fund = sessionds.Tables[0].Rows[0]["Fund"].ToString();
-            //String smsihno = sessionds.Tables[0].Rows[0]["IHNO"].ToString();
-
+         {
             if (!string.IsNullOrEmpty(Mobile))
             {
-                var connection = ConfigurationManager.ConnectionStrings["MFDWEB"].ConnectionString;
+                var connection = ConfigurationManager.ConnectionStrings["conStr"].ConnectionString;
                 SqlConnection con = new SqlConnection(connection);
                 SqlCommand cmd = new SqlCommand();
-                DataSet dsms = new DataSet();
 
-                SqlDataAdapter dataadp = new SqlDataAdapter("KTrack_Mob_InsertSMSLog_V17", connection);
-                dataadp.SelectCommand.CommandType = CommandType.StoredProcedure;
-                dataadp.SelectCommand.Parameters.Add("@i_Folio", SqlDbType.VarChar, 150).Value = "12345667";
-                dataadp.SelectCommand.Parameters.Add("@i_Fund", SqlDbType.VarChar, 150).Value = "102";
-                dataadp.SelectCommand.Parameters.Add("@i_TrNo", SqlDbType.VarChar, 150).Value = "";
-                dataadp.SelectCommand.Parameters.Add("@i_TrType", SqlDbType.VarChar, 150).Value = trtype;
-                dataadp.SelectCommand.Parameters.Add("@i_IHNo", SqlDbType.VarChar, 150).Value = "12345";
-                dataadp.SelectCommand.Parameters.Add("@i_MobileNo", SqlDbType.VarChar, 150).Value = Mobile;
-                dataadp.SelectCommand.Parameters.Add("@i_OtpNo", SqlDbType.VarChar, 150).Value = "";
-                dataadp.SelectCommand.Parameters.Add("@i_customfund", SqlDbType.VarChar, 10).Value = "102";
-                dataadp.SelectCommand.Parameters.Add("@i_Msg", SqlDbType.VarChar, 200).Value = msg;
+                cmd.CommandType = CommandType.Text;
 
-                dataadp.Fill(dsms);
+                cmd.CommandText = "INSERT INTO [communicationlog].dbo.[SMS_ProcessedFeeds](pf_Fund,pf_branch, pf_trtype,pf_Mobile, pf_msgtrtype, pf_msg,pf_entdt,pf_priority,pf_acno)    values ('102','WB99' , '" + trtype + "',RIGHT(" + Mobile + ",10), '" + trtype + "', " + msg + ",getdate(),1,0)";
 
+             
                 cmd.Connection = con;
                 con.Open();
                 cmd.CommandTimeout = 90000;
-                if (dsms.Tables.Count > 1)
-                {
-                    dsms.Tables[0].TableName = "Dtinformation";
-                    dsms.Tables[1].TableName = "DtData";
-                }
-                else
-                {
-                    dsms.Tables[0].TableName = "Dtinformation";
-                }
-
+                cmd.ExecuteNonQuery();
                 con.Close();
+               
+            
             }
         }
-//        public static void insertSmS(String msg, String Mobile, string trtype = "") //
-//        {
-
-//           // Mobile = "9618034828";
-//            // Mobile = "8500518924";
-           
-//            if (!string.IsNullOrEmpty(Mobile))
-//            {
-//                var connection = ConfigurationManager.ConnectionStrings["conStr"].ConnectionString;
-//                SqlConnection con = new SqlConnection(connection);
-//                SqlCommand cmd = new SqlCommand();
-
-//                cmd.CommandType = CommandType.Text;
-//                //cmd.CommandText = "INSERT INTO [OldBridge].CommunicationLog.dbo.SMS_critical_ProcessedFeeds(pf_Fund,pf_branch, pf_trtype,pf_Mobile, pf_msgtrtype, pf_msg,pf_entdt,pf_priority,pf_acno)    values ('139','WB99' , "+trtype+",RIGHT(" + Mobile + ",10), "+trtype+", " + msg + ",getdate(),1,0)";
-
-
-//                cmd.CommandText = "INSERT INTO [JMMF].[communicationlog].dbo.[SMS_ProcessedFeeds](pf_Fund,pf_branch, pf_trtype,pf_Mobile, pf_msgtrtype, pf_msg,pf_entdt,pf_priority,pf_acno)    values ('102','WB99' , '" + trtype + "',RIGHT(" + Mobile + ",10), '" + trtype + "', " + msg + ",getdate(),1,0)";
-
-               
-////                insert into #SMS_critical_ProcessedFeeds(pf_ihno)  
-////select pf_ihno from [Quant].[communicationlog].dbo.[SMS_ProcessedFeeds]  where pf_id=@otp_id
-//                cmd.Connection = con;
-//                con.Open();
-//                cmd.CommandTimeout = 90000;
-//                cmd.ExecuteNonQuery();
-//                con.Close();
-//            }
-//        }
 
         //public static void RegistrationConfirmationEmail(DataRow dr)
         //{
@@ -1983,17 +1906,7 @@ namespace MailingSelectedUsers
 
                                 if (!string.IsNullOrEmpty(mobile))
                                 {
-                                    insertSmS(sms, mobile, "NEW");
-
-                                   
-                                    //string folio_sms = folio;
-                                    //string fund_sms = fund;
-                                    //string trtype_sms = trtype;
-                                    //string ihno_sms = ihno;
-                                    //string mobile_sms = mobile;
-                                    //string msg_sms = sms;
-
-                                    //SendSms(folio_sms, fund_sms, trtype_sms, ihno_sms, mobile_sms, msg_sms);
+                                    insertSmS(sms, mobile, "NEW"); 
                                 }
                             }
                             else if (trtype == "SWP")
@@ -2208,11 +2121,42 @@ namespace MailingSelectedUsers
                                     insertSmS(sms, mobile, "CANC"); 
                                 }
                             }
+                            //added by Priyani 280824
+                            else if (trtype == "ISIP")
+                            {
+                                var XHeader = fund + "_" + ihno + "_" + "SIP";
+                                string relativePath1 = maindir + ConfigurationManager.AppSettings["ISIP"];
+                                StreamReader reader1 = new StreamReader(relativePath1);
+                                string body1 = LIC(reader1, dr);
+                                string Subject1 = "ISIP Request Acknowledgement from LIC Mutual Fund";
+                                bool SentFlag1 = SendEmail(tomailid, body1, Subject1, "", "", XHeader);
+                                if (SentFlag1)
+                                {
+                                    string resultMsg = " Mail Sent to  MailId";
+                                    GetdataforSentemail(fund.ToString(), ihno.ToString());
+                                }
+                              
+                              
+                                string sms = "' Dear Investor, we acknowledge the receipt of your ISIP request for Rs." + dr["sipamt"].ToString() + " in " + dr["schdesc"].ToString() + "-" + dr["plndesc"].ToString() + "-" + dr["optdesc"].ToString() + " with Ref.No." + dr["IHNO"].ToString() + " on " + dr["TranDate"].ToString() + " . SOA shall be sent to your e-mail address after transaction is processed. -LICMF'";
+
+                            
+
+                                if (String.IsNullOrEmpty(Convert.ToString(dr["Folio_No"])))
+                                {
+                                    sms = string.Format(sms, "(not yet allocated)");
+                                }
+                                else
+                                {
+                                    sms = string.Format(sms, Convert.ToString(dr["Folio_No"]));
+                                }
+
+                                if (!string.IsNullOrEmpty(mobile))
+                                {
+                                    insertSmS(sms, mobile, "ISIP"); //
+                                }
+                            }
 
                             //Priyani end
-
-
-
                         }
                     }
                 }
@@ -8004,7 +7948,6 @@ namespace MailingSelectedUsers
                                                 break;
                                             case "STPCANCELLATION":
                                             case "SWPCANCELLATION":
-                                            
                                             case "REDEMPTION":
                                             case "SIN":
                                             case "SINI":
@@ -8078,27 +8021,29 @@ namespace MailingSelectedUsers
                                                                      
                                         switch (trtype)
                                         {
-                                            
+
                                             case "SWITCH":
-                                                body = body.Replace("<td class='auto-style4'>To Scheme/Plan/Option</td>", "<td class='auto-style4'>Switch In</td>");
-                                              break;
-   
+                                                body = body.Replace("To Scheme/Plan/Option", "Switch In");
+                                                break;
+
                                             case "STP":
-                                               body = body.Replace("<td class='auto-style4'>To Scheme/Plan/Option</td>", "<td class='auto-style4'>Transfer To</td>");
-                                                 break;
-                                        
+                                                body = body.Replace("To Scheme/Plan/Option</td>", "Transfer To");
+                                                break;
+
                                             case "REDEMPTION":
                                             case "SIPPAUSE":
                                             case "SIN":
                                             case "SINI":
                                             case "SIPCANCELLATION":
+                                            case "STPCANCELLATION":
                                             case "NEWPURCHASE":
-                                                 body = body.Replace("<tr id='Toscheme'>", "<tr id='Toscheme' style='display:none;'>");
-                                                 break;
-                                             default:
-                                             body = body.Replace("<tr id='Toscheme'>","<tr id='Toscheme' style='display:none;'>");
-        
+                                            case "PURCHASE":
+                                            default:
+                                                body = body.Replace("<tr id='Toscheme'>", "<tr id='Toscheme' style='display:none;'>");
+
                                                 break;
+                                        
+                                          
                                         }
                                     }
 
